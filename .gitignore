@@ -1,0 +1,21 @@
+# 런타임 생성물 — 브로커가 만드는 파티션 로그 / 커밋 offset
+/data/
+
+# 컴파일된 바이너리 (go build ./cmd/... 산출물)
+/broker
+/cli
+/consumer
+/loadgen
+*.test
+*.out
+
+# macOS
+.DS_Store
+
+# Claude / AI 툴링 (개발 환경 설정 — 프로젝트 실체 아님)
+CLAUDE.md
+AGENTS.md
+.claude/
+
+# 내부 하드닝 백로그 (공개 제외)
+NEED_FIX.md
