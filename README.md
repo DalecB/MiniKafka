@@ -19,6 +19,7 @@ Go로 밑바닥부터 구현한 **카프카식 로그 기반 메시지 브로커
 ```mermaid
 flowchart LR
     subgraph clients[클라이언트]
+        PR[cmd/producer<br/>단건 쓰기]
         CLI[cmd/demo<br/>데모]
         LG[cmd/loadgen<br/>부하생성기]
         CO[cmd/consumer<br/>컨슈머]
@@ -37,7 +38,7 @@ flowchart LR
         OF[(data/__offsets/log)]
     end
 
-    CLI & LG -->|PRODUCE/FETCH| HC
+    CLI & LG & PR -->|PRODUCE/FETCH| HC
     CO -->|FETCH/COMMIT/GET-COMMITTED| HC
     HC --> TP
     HC --> OS
@@ -49,8 +50,9 @@ flowchart LR
 - `internal/log` — 코어. append-only 로그(`Log`), 파티션 라우팅(`Topic`), 커밋 저장소(`OffsetStore`)
 - `internal/client` — 얇은 클라이언트 라이브러리 (`Produce`/`Fetch`/`Commit`/`GetCommitted`)
 - `cmd/broker` — TCP 브로커
-- `cmd/demo` — produce→fetch 왕복 데모
+- `cmd/producer` — 단건 produce (CLI, 컨슈머의 짝)
 - `cmd/consumer` — 파티션 소비 + offset 커밋
+- `cmd/demo` — produce→fetch 왕복 데모
 - `cmd/loadgen` — 부하 생성 + 처리량/지연 측정
 
 **저장 포맷:** 각 레코드는 `[4바이트 길이(빅엔디안)][payload]`. offset은 파일 내 **byte 위치**.
@@ -80,6 +82,12 @@ go run ./cmd/broker [--fsync N]
 ---
 
 ## 구성 요소 실행법
+
+### cmd/producer — 단건 produce
+```bash
+go run ./cmd/producer --key user-42 --payload "안녕"
+```
+`--key`로 파티션을 정하고 `--payload`를 그 파티션에 하나 쓴다. 반환된 partition/offset 출력. `cmd/consumer`의 짝.
 
 ### cmd/demo — produce→fetch 왕복 데모
 ```bash
