@@ -19,7 +19,7 @@ Go로 밑바닥부터 구현한 **카프카식 로그 기반 메시지 브로커
 ```mermaid
 flowchart LR
     subgraph clients[클라이언트]
-        CLI[cmd/cli<br/>데모]
+        CLI[cmd/demo<br/>데모]
         LG[cmd/loadgen<br/>부하생성기]
         CO[cmd/consumer<br/>컨슈머]
     end
@@ -49,7 +49,7 @@ flowchart LR
 - `internal/log` — 코어. append-only 로그(`Log`), 파티션 라우팅(`Topic`), 커밋 저장소(`OffsetStore`)
 - `internal/client` — 얇은 클라이언트 라이브러리 (`Produce`/`Fetch`/`Commit`/`GetCommitted`)
 - `cmd/broker` — TCP 브로커
-- `cmd/cli` — produce→fetch 왕복 데모
+- `cmd/demo` — produce→fetch 왕복 데모
 - `cmd/consumer` — 파티션 소비 + offset 커밋
 - `cmd/loadgen` — 부하 생성 + 처리량/지연 측정
 
@@ -81,9 +81,9 @@ go run ./cmd/broker [--fsync N]
 
 ## 구성 요소 실행법
 
-### cmd/cli — produce→fetch 왕복 데모
+### cmd/demo — produce→fetch 왕복 데모
 ```bash
-go run ./cmd/cli
+go run ./cmd/demo
 ```
 key `"user-1"`로 메시지 하나를 produce하고, 반환된 (partition, offset)으로 다시 fetch해서 출력. 프로토콜 왕복이 되는지 확인용.
 
@@ -207,7 +207,7 @@ go test -count=1 ./internal/log        # 캐시 무시하고 재실행
 
 **재시작 재개:**
 ```bash
-go run ./cmd/cli; go run ./cmd/cli; go run ./cmd/cli   # 3건 produce (파티션 1)
+go run ./cmd/demo; go run ./cmd/demo; go run ./cmd/demo   # 3건 produce (파티션 1)
 go run ./cmd/consumer --partitions 1 --group demo      # 3건 소비 + 커밋
 go run ./cmd/consumer --partitions 1 --group demo      # 아무것도 안 나옴 = 재개 성공
 ```
